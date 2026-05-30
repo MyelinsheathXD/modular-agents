@@ -178,7 +178,19 @@ public class MjImporterWithAssets : MjcfImporter {
   private void CopyMeshAndRescale(
       string sourceFilePath, string targetFilePath, Vector3 scale) {
     var originalMeshBytes = File.ReadAllBytes(sourceFilePath);
-    var mesh = StlMeshParser.ParseBinary(originalMeshBytes, scale);
+    var extension = Path.GetExtension(sourceFilePath).ToLowerInvariant();
+    Mesh mesh;
+    switch (extension) {
+      case ".stl":
+        mesh = StlMeshParser.ParseBinary(originalMeshBytes, scale);
+        break;
+      case ".obj":
+        mesh = ObjMeshParser.Parse(originalMeshBytes, scale);
+        break;
+      default:
+        throw new NotSupportedException(
+          $"Unsupported mesh format '{extension}' for file '{sourceFilePath}'.");
+    }
     var rescaledMeshBytes = StlMeshParser.SerializeBinary(mesh);
     File.WriteAllBytes(targetFilePath, rescaledMeshBytes);
   }

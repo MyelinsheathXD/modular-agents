@@ -166,6 +166,9 @@ public class StlMeshParser {
           "The mesh exceeds the number of vertices per mesh allowed by Unity. " +
           $"({vertices.Count} > {_unityLimitNumVerticesPerMesh})");
     }
+    if (vertices.Count == 0) {
+      throw new IOException("ASCII STL contains no vertices. The file may not be STL.");
+    }
 
     var mesh = new Mesh();
     mesh.vertices = vertices.ToArray();
