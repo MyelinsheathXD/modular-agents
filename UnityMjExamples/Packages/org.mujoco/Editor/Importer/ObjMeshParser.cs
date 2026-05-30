@@ -35,13 +35,20 @@ public static class ObjMeshParser {
     var vertices = new List<Vector3>();
     var triangles = new List<int>();
 
+    var separators = new[] {' ', '\t'};
     using (var stream = new MemoryStream(objFileContents)) {
       using (var reader = new StreamReader(stream)) {
         string line;
         while ((line = reader.ReadLine()) != null) {
           var trimmed = line.Trim();
-          if (trimmed.StartsWith("v ", StringComparison.OrdinalIgnoreCase)) {
-            var parts = trimmed.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+          if (string.IsNullOrEmpty(trimmed) || trimmed.StartsWith("#")) {
+            continue;
+          }
+          var parts = trimmed.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+          if (parts.Length == 0) {
+            continue;
+          }
+          if (string.Equals(parts[0], "v", StringComparison.OrdinalIgnoreCase)) {
             if (parts.Length >= 4) {
               var vertex = new Vector3(
                 float.Parse(parts[1], CultureInfo.InvariantCulture),
@@ -49,16 +56,14 @@ public static class ObjMeshParser {
                 float.Parse(parts[3], CultureInfo.InvariantCulture));
               vertices.Add(ToXZY(Vector3.Scale(vertex, scale)));
             }
-          } else if (trimmed.StartsWith("f ", StringComparison.OrdinalIgnoreCase)) {
-            var tokens = trimmed.Substring(2)
-              .Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-            if (tokens.Length < 3) {
+          } else if (string.Equals(parts[0], "f", StringComparison.OrdinalIgnoreCase)) {
+            if (parts.Length < 4) {
               continue;
             }
-            var faceIndices = new int[tokens.Length];
+            var faceIndices = new int[parts.Length - 1];
             var validCount = 0;
-            for (var i = 0; i < tokens.Length; i++) {
-              var indexToken = tokens[i];
+            for (var i = 1; i < parts.Length; i++) {
+              var indexToken = parts[i];
               if (string.IsNullOrEmpty(indexToken)) {
                 continue;
               }
@@ -94,6 +99,9 @@ public static class ObjMeshParser {
 
     if (vertices.Count == 0) {
       throw new IOException("OBJ contains no vertices or uses an unsupported format.");
+    }
+    if (triangles.Count == 0) {
+      throw new IOException("OBJ contains no faces or uses an unsupported format.");
     }
     if (vertices.Count > _unityLimitNumVerticesPerMesh) {
       throw new IndexOutOfRangeException(

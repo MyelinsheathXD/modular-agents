@@ -208,7 +208,7 @@ public class StlMeshParser {
 
           writer.Write((short)0);
         }
-        return stream.GetBuffer();
+        return stream.ToArray();
       }
     }
   }

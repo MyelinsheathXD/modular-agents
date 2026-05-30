@@ -26,8 +26,32 @@ public class MjMeshShape : IMjShape {
 
   public void ToMjcf(XmlElement mjcf, Transform transform) {
     var scene = MjScene.Instance;
+    if (Mesh == null && transform != null) {
+      TryAssignMesh(transform.GetComponent<MeshFilter>()?.sharedMesh);
+      TryAssignMesh(transform.GetComponent<MeshCollider>()?.sharedMesh);
+      TryAssignMesh(transform.GetComponent<SkinnedMeshRenderer>()?.sharedMesh);
+    }
+    if (Mesh == null) {
+      var objectName = transform != null ? transform.name : "<unknown>";
+      throw new Exception($"Mesh geom '{objectName}' has no Mesh assigned.");
+    }
+    if (Mesh.vertexCount == 0) {
+      var objectName = transform != null ? transform.name : "<unknown>";
+      throw new Exception(
+        $"Mesh geom '{objectName}' has zero vertices. Ensure the mesh is valid and readable.");
+    }
     var assetName = scene.GenerationContext.AddMeshAsset(Mesh);
     mjcf.SetAttribute("mesh", assetName);
+  }
+
+  private void TryAssignMesh(Mesh candidate) {
+    if (Mesh != null || candidate == null) {
+      return;
+    }
+    if (candidate.vertexCount == 0) {
+      return;
+    }
+    Mesh = candidate;
   }
 
   public void FromMjcf(XmlElement mjcf) {
