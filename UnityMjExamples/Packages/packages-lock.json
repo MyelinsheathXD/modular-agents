@@ -125,8 +125,8 @@
       "source": "registry",
       "dependencies": {
         "com.unity.barracuda": "3.0.0",
-        "com.unity.modules.imageconversion": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0"
+        "com.unity.modules.jsonserialize": "1.0.0",
+        "com.unity.modules.imageconversion": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -188,9 +188,9 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
+        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.director": "1.0.0",
         "com.unity.modules.animation": "1.0.0",
-        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.particlesystem": "1.0.0"
       },
       "url": "https://packages.unity.com"
@@ -215,11 +215,10 @@
       "url": "https://packages.unity.com"
     },
     "org.mujoco": {
-      "version": "https://github.com/Balint-H/mujoco.git?path=unity#modular-agents",
+      "version": "file:org.mujoco",
       "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "1974699e2b82bc890b254fab859070f19872bf50"
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
